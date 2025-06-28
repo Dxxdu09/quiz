@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz: Mente de Estrategista ou Manipulador?</title>
+  <style>
+    /* ... todo o seu CSS original aqui, sem mudanças ... */
+    /* Para evitar resposta gigante, não colei o CSS inteiro novamente, mas você pode manter como estava */
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <!-- Toda sua estrutura HTML permanece a mesma -->
+    <!-- Intro, perguntas, loading, resultado -->
+    <!-- Copie aqui exatamente o conteúdo que você já tinha em <div class="quiz-container"> -->
+  </div>
+
+  <!-- MOVIDO para o final do body -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let currentQuestion = 0;
+      let answers = {};
+      const totalQuestions = 9;
+
+      const profiles = {
+        strategist: {
+          title: "ESTRATEGISTA NATURAL",
+          description: "Você possui uma mente analítica e calculista...",
+          nextStep: "Você precisa aprender a acelerar suas decisões..."
+        },
+        manipulator: {
+          title: "MANIPULADOR INTUITIVO",
+          description: "Você tem uma habilidade natural para ler pessoas...",
+          nextStep: "Você precisa aprender a usar esse poder de forma ética..."
+        },
+        leader: {
+          title: "LÍDER CARISMÁTICO",
+          description: "Você tem o dom natural da liderança...",
+          nextStep: "Você precisa aprender técnicas avançadas de persuasão..."
+        },
+        hybrid: {
+          title: "HÍBRIDO PODEROSO",
+          description: "Você combina características de estrategista e manipulador...",
+          nextStep: "Você precisa aprender a equilibrar essas habilidades..."
+        }
+      };
+
+      function startQuiz() {
+        document.getElementById('intro').classList.remove('active');
+        document.getElementById('progressBar').style.display = 'block';
+        document.getElementById('stepCounter').style.display = 'block';
+        currentQuestion = 1;
+        showQuestion(1);
+        updateProgress();
+      }
+
+      function showQuestion(questionNum) {
+        document.querySelectorAll('.question-content').forEach(q => q.classList.remove('active'));
+        document.getElementById('q' + questionNum).classList.add('active');
+        updateStepCounter();
+      }
+
+      function updateProgress() {
+        const progress = (currentQuestion / totalQuestions) * 100;
+        document.getElementById('progressFill').style.width = progress + '%';
+      }
+
+      function updateStepCounter() {
+        document.getElementById('stepCounter').textContent = `Pergunta ${currentQuestion} de ${totalQuestions}`;
+      }
+
+      function checkAgeInput() {
+        const ageInput = document.getElementById('ageInput');
+        const nextButton = document.getElementById('next1');
+        const errorMsg = document.getElementById('ageError');
+        const age = parseInt(ageInput.value);
+
+        if (age >= 16 && age <= 100) {
+          nextButton.classList.add('enabled');
+          errorMsg.style.display = 'none';
+          answers.age = age;
+        } else {
+          nextButton.classList.remove('enabled');
+          errorMsg.style.display = ageInput.value !== '' ? 'block' : 'none';
+        }
+      }
+
+      function selectOption(q, val, el, text) {
+        el.parentNode.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+        answers['q' + q] = { option: val, text };
+        document.getElementById('next' + q).classList.add('enabled');
+        document.getElementById('phrase' + q).classList.add('show');
+      }
+
+      function selectLeader(q, val, el, text) {
+        el.parentNode.querySelectorAll('.leader').forEach(l => l.classList.remove('selected'));
+        el.classList.add('selected');
+        answers['q' + q] = { option: val, text };
+        document.getElementById('next' + q).classList.add('enabled');
+        document.getElementById('phrase' + q).classList.add('show');
+      }
+
+      function checkQuestionInput() {
+        const input = document.getElementById('questionInput');
+        const nextBtn = document.getElementById('next5');
+        if (input.value.trim().length > 10) {
+          nextBtn.classList.add('enabled');
+          answers.q5 = { text: input.value.trim() };
+          document.getElementById('phrase5').classList.add('show');
+        } else {
+          nextBtn.classList.remove('enabled');
+        }
+      }
+
+      function nextQuestion(current) {
+        if (current < totalQuestions) {
+          currentQuestion = current + 1;
+          showQuestion(currentQuestion);
+          updateProgress();
+        }
+      }
+
+      function showResults() {
+        document.getElementById('q9').classList.remove('active');
+        document.getElementById('loading').classList.add('active');
+        document.getElementById('progressBar').style.display = 'none';
+        document.getElementById('stepCounter').style.display = 'none';
+
+        setTimeout(() => {
+          const result = calculateResult();
+          displayResult(result);
+          document.getElementById('loading').classList.remove('active');
+          document.getElementById('results').classList.add('active');
+        }, 3000);
+      }
+
+      function calculateResult() {
+        let strategist = 0, manipulator = 0, leader = 0;
+        const q = answers;
+
+        if (q.q2?.option === 'D') strategist += 2;
+        if (q.q2?.option === 'C') manipulator += 1;
+        if (q.q2?.option === 'B') leader += 1;
+
+        if (q.q3?.option === 'A') strategist += 2;
+        if (q.q3?.option === 'C') manipulator += 2;
+        if (q.q3?.option === 'B') leader += 2;
+
+        if (q.q4?.option === 'A') strategist += 2;
+        if (q.q4?.option === 'C') manipulator += 2;
+        if (q.q4?.option === 'B') leader += 2;
+        if (q.q4?.option === 'D') manipulator += 1;
+
+        if (q.q6?.option === 'C') strategist += 2;
+        if (q.q6?.option === 'A') manipulator += 1;
+
+        if (q.q7?.option === 'C') strategist += 2;
+        if (['B','D'].includes(q.q7?.option)) manipulator += 2;
+        if (q.q7?.option === 'A') leader += 1;
+
+        if (q.q8?.option === 'D') strategist += 2;
+        if (q.q8?.option === 'C') manipulator += 1;
+        if (q.q8?.option === 'A') leader += 1;
+
+        if (strategist >= manipulator && strategist >= leader) return manipulator > 3 ? 'hybrid' : 'strategist';
+        if (manipulator >= strategist && manipulator >= leader) return strategist > 3 ? 'hybrid' : 'manipulator';
+        return 'leader';
+      }
+
+      function displayResult(type) {
+        const p = profiles[type];
+        document.getElementById('resultTitle').textContent = p.title;
+        document.getElementById('resultDescription').textContent = p.description;
+        document.getElementById('nextStepText').textContent = p.nextStep;
+      }
+
+      window.startQuiz = startQuiz;
+      window.checkAgeInput = checkAgeInput;
+      window.selectOption = selectOption;
+      window.selectLeader = selectLeader;
+      window.checkQuestionInput = checkQuestionInput;
+      window.nextQuestion = nextQuestion;
+      window.showResults = showResults;
+      window.handleFinalCTA = function () {
+        alert('Redirecionando para a página de oferta...');
+        // window.location.href = 'https://sua-pagina.com';
+      };
+    });
+  </script>
+</body>
+</html>
